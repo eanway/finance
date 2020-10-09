@@ -1,4 +1,15 @@
-new_Model <- function(total_amount = numeric(), annual_amount = numeric(), years_until_available = numeric()) {
+#' Allocate Assets
+#'
+#' @param total_amount numeric
+#' @param annual_amount numeric
+#' @param years_until_available numeric
+#'
+#' @return list
+#' @export
+#'
+#' @examples
+#' allocate_assets(100000, 20000, 10)
+allocate_assets <- function(total_amount = numeric(), annual_amount = numeric(), years_until_available = numeric()) {
 
   amount_needed_until_available <- get_amount_needed_until_available(annual_amount, years_until_available)
 
