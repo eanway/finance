@@ -2,92 +2,104 @@
 #'
 #' @param total_amount numeric
 #' @param annual_amount numeric
-#' @param years_until_available numeric
+#' @param years_waiting numeric
 #'
 #' @return list
 #' @export
 #'
 #' @examples
 #' allocate_assets(100000, 20000, 10)
-allocate_assets <- function(total_amount = numeric(), annual_amount = numeric(), years_until_available = numeric()) {
+allocate_assets <- function(total_amount = numeric(), annual_amount = numeric(), years_waiting = numeric()) {
 
-  amount_needed_until_available <- get_amount_needed_until_available(annual_amount, years_until_available)
+  years_saved <- total_amount / annual_amount
 
-  ratio_total_annual <- total_amount / annual_amount
+  constant <- 1.01
 
-  ratio_total_annual_asymptote <- get_ratio_total_annual_asymptote(years_until_available)
+  # the infinite withdrawal rate is also the rate of return
+  return_rate_infinite <- 0.05
 
-  ratio_total_annual_infinite <- 20
+  years_saved_infinite <- get_years_saved_infinite(constant, return_rate_infinite, years_waiting)
 
-  years_until_available_asymptote <- get_years_until_available_asymptote(ratio_total_annual)
+  years_waiting_infinite <- get_years_waiting_infinite(constant, return_rate_infinite, years_saved)
 
-  is_infinite <- ratio_total_annual >= ratio_total_annual_asymptote | years_until_available >= years_until_available_asymptote
+  is_infinite <- years_saved >= years_saved_infinite | years_waiting >= years_waiting_infinite
 
-  percent_bonds_asymptote <- get_percent_bonds(14.5)
+  years_until_depleted <- get_years_until_depleted(constant, return_rate_infinite, years_saved, years_waiting)
 
-  amount_bonds_asymptote <- annual_amount * percent_bonds_asymptote
+  years_bonds <- get_years_bonds(years_until_depleted) - get_years_bonds(years_waiting)
 
-  if(is_infinite) {
-    years_until_depleted <- Inf
+  amount_bonds <- years_bonds * annual_amount
 
-    percent_bonds <- percent_bonds_asymptote - get_percent_bonds(years_until_available)
+  percent_bonds <- amount_bonds / total_amount
 
+  list(
+    years_until_depleted = years_until_depleted,
+    amount_bonds = amount_bonds,
+    percent_bonds = percent_bonds
+  )
+}
+
+# return is about 5% (0.05) each year = return
+# the annual amount needed when available = annual_amount
+# the total amount available when needed = total_amount
+# the number of years until the annual amount is needed = years_waiting
+# the years of money already saved = total_amount / annual_amount = years_saved
+# less money is needed in later years because unneeded money will grow ~5% a year
+# the money needed each year is modeled by:
+## years_saved = 1.01 * exp(-return * years_waiting)
+### because the return is constant,
+### the total amount depends only on the years_waiting
+## this equation gives the amount needed for a single year, not multiple years
+## the total amount needed for multiple years is modeled by
+## the indefinite integral of the equation:
+### f(y) = years_saved = -1.01 * exp(-return * years_waiting) / return
+## as the years until needed approaches infinity, the years_saved approaches 0
+get_years_saved_at_year <- function(constant, return_rate, years_waiting) {
+  -constant * exp(-return_rate * years_waiting) / return_rate
+}
+
+# if you have to wait before using the money
+# how much money do you need before it's infinite?
+## the definite integral from the years_waiting to Inf is:
+### f(Inf) - f(years_waiting)
+### f(Inf) = 0
+get_years_saved_infinite <- function(constant, return_rate, years_waiting) {
+  0 - get_years_saved_at_year(constant, return_rate, years_waiting)
+}
+
+# if you have some years saved
+## how many years do you need to wait before it's infinite?
+# years_saved = f(Inf) - f(years_waiting)
+## years_saved = 0 - -1.01 * exp(-return_rate * years_waiting) / return_rate
+### years_saved = 1.01 * exp(-return_rate * years_waiting) / return_rate
+# solve for years_waiting:
+## years_waiting = log(withdrawal_rate * return_rate / 1.01) / return_rate
+get_years_waiting_infinite <- function(constant, return_rate, years_saved) {
+  log(constant / (return_rate * years_saved)) / return_rate
+}
+
+# if you have some years saved and some years to wait
+## how many years will it last once you start using it?
+## years_saved = f(years_effective) - f(years_waiting)
+# check if the assets will last forever:
+check_infinite <- function(constant, return_rate, years_saved, years_waiting) {
+  years_saved * return_rate / constant > exp(-return_rate * years_waiting)
+}
+
+# solve for years until depleted:
+get_years_until_depleted <- function(constant, return_rate, years_saved, years_waiting) {
+  if(check_infinite(constant, return_rate, years_saved, years_waiting)) {
+    Inf
   } else {
-    years_until_depleted <- get_years_until_depleted(ratio_total_annual, years_until_available)
-
-    percent_bonds <- get_percent_bonds(years_until_depleted) - get_percent_bonds(years_until_available)
+    log(
+      -constant / (
+        return_rate * years_saved - constant * exp(-return_rate * years_waiting)
+      )
+    ) / return_rate
   }
-
-  amount_bonds <- percent_bonds * annual_amount
-
-  total_amount_infinite_min <- annual_amount * ratio_total_annual_asymptote
-
-  annual_amount_infinite_max <- total_amount / ratio_total_annual_asymptote
-
-  amount_bonds_infinite_max <- annual_amount_infinite_max * percent_bonds_asymptote
-
-  model <-
-    structure(
-      list(
-        total_amount = total_amount,
-        annual_amount = annual_amount,
-        years_until_available = years_until_available,
-        amount_needed_until_available = amount_needed_until_available,
-        ratio_total_annual = ratio_total_annual,
-        ratio_total_annual_asymptote = ratio_total_annual_asymptote,
-        years_until_available_asymptote = years_until_available_asymptote,
-        is_infinite = is_infinite,
-        ratio_total_annual_infinite = ratio_total_annual_infinite,
-        years_until_depleted = years_until_depleted,
-        total_amount_infinite_min = total_amount_infinite_min,
-        annual_amount_infinite_max = annual_amount_infinite_max,
-        percent_bonds = percent_bonds,
-        amount_bonds = amount_bonds,
-        amount_bonds_infinite_max = amount_bonds_infinite_max
-      ),
-      class = "model"
-    )
-
-  return(model)
 }
 
-get_amount_needed_until_available <- function(annual_amount, years_until_available) {
-  annual_amount * (-20 * exp(-0.05 * years_until_available) + 20)
-}
-
-get_ratio_total_annual_asymptote <- function(years_until_available) {
-  20 / exp(years_until_available) ^ (1/20)
-}
-
-get_years_until_available_asymptote <- function(ratio_total_annual) {
-  20 * log(20 / ratio_total_annual)
-}
-
-get_years_until_depleted <- function(ratio_total_annual, years_until_available) {
-  20 * log(-20 / (ratio_total_annual - 20 * exp(-years_until_available / 20)))
-}
-
-get_percent_bonds <- function(year) {
+get_years_bonds <- function(year) {
   # integral of 0.87-0.06y
   # equals zero at 14.5
   year_range <- min(max(0, year), 14.5)
