@@ -1,29 +1,28 @@
-#' Allocate Assets
+#' Get an amount of bonds to include in your portfolio
 #'
+#' Suggests an amount of bonds to include in your portfolio based on
+#' the total value of your portfolio, the annual amount you'd like to withdraw,
+#' and the number of years until withdrawals begin.
+#'
+#' @param intercept Optional intercept for efficient bond allocation. Must be between 0 and 1. Defaults determined by experimentation.
+#' @param slope Optional slope for efficient bond allocation. Must be between -1 and 0. Defaults determined by experimentation.
 #' @inheritParams get_years_until_depleted
 #'
-#' @return list
+#' @return An amount of bonds to include in your portfolio
 #' @export
 #'
 #' @examples
-#' allocate_assets(100000, 20000, 10)
-allocate_assets <- function(total_amount = numeric(), annual_amount = numeric(), years_waiting = numeric(), constant = 1.01, return_rate = 0.05) {
+#' get_amount_bonds(100000, 20000, 10)
+get_amount_bonds <- function(total_amount = numeric(), annual_amount = numeric(), years_waiting = numeric(), constant = 1.01, return_rate = 0.05, intercept = 0.87, slope = -0.06) {
 
   years_until_depleted <- get_years_until_depleted(total_amount, annual_amount, years_waiting, constant, return_rate)
 
-  years_bonds <- get_years_bonds(years_waiting, years_until_depleted)
+  years_bonds <- get_years_bonds(years_waiting, years_until_depleted, intercept, slope)
 
-  amount_bonds <- years_bonds * annual_amount
-
-  percent_bonds <- amount_bonds / total_amount
-
-  list(
-    amount_bonds = amount_bonds,
-    percent_bonds = percent_bonds
-  )
+  years_bonds * annual_amount
 }
 
-get_years_bonds <- function(years_waiting, years_until_depleted) {
+get_years_bonds <- function(years_waiting, years_until_depleted, intercept = 0.87, slope = -0.06) {
   if(years_until_depleted < years_waiting) {
     stop("The years until depleted must be greater than the years waiting")
   }
@@ -31,9 +30,9 @@ get_years_bonds <- function(years_waiting, years_until_depleted) {
   max(
     0,
     get_years_bonds_integral(
-      years_until_depleted
+      years_until_depleted, intercept, slope
     ) - get_years_bonds_integral(
-      years_waiting
+      years_waiting, intercept, slope
     )
   )
 }
