@@ -18,12 +18,6 @@ allocate_assets <- function(total_amount = numeric(), annual_amount = numeric(),
   # the infinite withdrawal rate is also the rate of return
   return_rate_infinite <- 0.05
 
-  years_saved_infinite <- get_years_saved_infinite(constant, return_rate_infinite, years_waiting)
-
-  years_waiting_infinite <- get_years_waiting_infinite(constant, return_rate_infinite, years_saved)
-
-  is_infinite <- years_saved >= years_saved_infinite | years_waiting >= years_waiting_infinite
-
   years_until_depleted <- get_years_until_depleted(constant, return_rate_infinite, years_saved, years_waiting)
 
   years_bonds <- get_years_bonds(years_until_depleted) - get_years_bonds(years_waiting)
@@ -81,6 +75,9 @@ get_years_waiting_infinite <- function(constant, return_rate, years_saved) {
 # if you have some years saved and some years to wait
 ## how many years will it last once you start using it?
 ## years_saved = f(years_effective) - f(years_waiting)
+## when solving for years_effective, you need to take the log of both sides
+### the difference of the terms below is on one side
+## a negative value can't be logged and means that the final value will be infinite
 # check if the assets will last forever:
 check_infinite <- function(constant, return_rate, years_saved, years_waiting) {
   years_saved * return_rate / constant > exp(-return_rate * years_waiting)
@@ -92,16 +89,12 @@ get_years_until_depleted <- function(constant, return_rate, years_saved, years_w
     Inf
   } else {
     log(
-      -constant / (
-        return_rate * years_saved - constant * exp(-return_rate * years_waiting)
-      )
-    ) / return_rate
+      exp(-return_rate * years_waiting) - return_rate * years_saved / constant
+    ) / -return_rate
   }
 }
 
 get_years_bonds <- function(year) {
   # integral of 0.87-0.06y
-  # equals zero at 14.5
-  year_range <- min(max(0, year), 14.5)
-  0.87*year_range - 0.03 * year_range^2
+  max(0, 0.87*year - 0.03 * year^2)
 }
