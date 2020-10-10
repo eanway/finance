@@ -1,10 +1,6 @@
 #' Allocate Assets
 #'
-#' @param total_amount numeric
-#' @param annual_amount numeric
-#' @param years_waiting numeric
-#' @param constant optional constant to adjust depletion calculation
-#' @param return_rate optional rate of return
+#' @inheritParams get_years_until_depleted
 #'
 #' @return list
 #' @export

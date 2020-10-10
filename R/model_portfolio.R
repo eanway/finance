@@ -2,11 +2,11 @@
 #'
 #' Calculate how many years a portfolio will last until it is fully depleted
 #'
-#' @param total_amount
-#' @param annual_amount
-#' @param years_waiting
-#' @param constant
-#' @param return_rate
+#' @param total_amount Total amount in the portfolio. Numeric greater than 0.
+#' @param annual_amount Annual amount to be withdrawn from the portfolio. Numeric greater than 0.
+#' @param years_waiting Years until the annual amount will start being withdrawn. Numeric greater than or equal to 0.
+#' @param constant Optional constant to reduce short-term returns. Default determined from experimentation.
+#' @param return_rate Optional long term rate of return. Default determined from experimentation.
 #'
 #' @return positive numeric or Inf
 #' @export
@@ -29,7 +29,7 @@ get_years_until_depleted <- function(total_amount = numeric(), annual_amount = n
 }
 
 get_years_saved <- function(total_amount, annual_amount) {
-  total_amoung / annual_amount
+  total_amount / annual_amount
 }
 
 # return is about 5% (0.05) each year = return
