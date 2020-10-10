@@ -19,7 +19,10 @@ allocate_assets <- function(total_amount = numeric(), annual_amount = numeric(),
 
   years_until_depleted <- get_years_until_depleted(constant, return_rate_infinite, years_saved, years_waiting)
 
-  years_bonds <- get_years_bonds(years_until_depleted) - get_years_bonds(years_waiting)
+  years_bonds <- max(
+    0,
+    get_years_bonds(years_until_depleted) - get_years_bonds(years_waiting)
+  )
 
   amount_bonds <- years_bonds * annual_amount
 
@@ -92,5 +95,5 @@ get_years_until_depleted <- function(constant, return_rate, years_saved, years_w
 
 get_years_bonds <- function(year) {
   # integral of 0.87-0.06y
-  max(0, 0.87*year - 0.03 * year^2)
+  0.87*year - 0.03 * year^2
 }
