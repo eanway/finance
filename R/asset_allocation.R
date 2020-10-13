@@ -13,16 +13,16 @@
 #'
 #' @examples
 #' get_amount_bonds(100000, 20000, 10)
-get_amount_bonds <- function(total_amount = numeric(), annual_amount = numeric(), years_waiting = numeric(), constant = 1.01, return_rate = 0.05, intercept = 0.87, slope = -0.06) {
+get_amount_bonds <- function(total_amount = numeric(), annual_amount = numeric(), years_waiting = numeric(), constant = 1.01, return_rate = 0.05, ...) {
 
   years_until_depleted <- get_years_until_depleted(total_amount, annual_amount, years_waiting, constant, return_rate)
 
-  years_bonds <- get_years_bonds(years_waiting, years_until_depleted, intercept, slope)
+  years_bonds <- get_years_bonds(years_waiting, years_until_depleted, ...)
 
   years_bonds * annual_amount
 }
 
-get_years_bonds <- function(years_waiting, years_until_depleted, intercept = 0.87, slope = -0.06) {
+get_years_bonds <- function(years_waiting, years_until_depleted, ...) {
   if(years_until_depleted < years_waiting) {
     stop("The years until depleted must be greater than the years waiting")
   }
@@ -30,14 +30,14 @@ get_years_bonds <- function(years_waiting, years_until_depleted, intercept = 0.8
   max(
     0,
     get_years_bonds_integral(
-      years_until_depleted, intercept, slope
+      years_until_depleted, ...
     ) - get_years_bonds_integral(
-      years_waiting, intercept, slope
+      years_waiting, ...
     )
   )
 }
 
-get_years_bonds_integral <- function(year, intercept = 0.87, slope = -0.06) {
+get_years_bonds_integral <- function(year, intercept = 0.8, slope = -0.036) {
   if(intercept < 0 | 1 <= intercept) {
     stop("The intercept must be between 0 and 1: (0, 1]")
   }
