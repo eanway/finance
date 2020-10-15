@@ -30,7 +30,7 @@ plan_retirement_allocation <- function(birth_year, age, starting_amount, annual_
   vec_periods <- 1:n_periods
   new_total <- starting_amount
   current_years_until_available <- 65 - age
-  vec_years_waiting <- max(0, current_years_until_available - vec_periods)
+  vec_years_waiting <- pmax(0, current_years_until_available - vec_periods)
   current_bond_value <- get_amount_bonds(
     total_amount = new_total,
     annual_amount = annual_withdrawal,
@@ -43,6 +43,7 @@ plan_retirement_allocation <- function(birth_year, age, starting_amount, annual_
     period = vec_periods,
     year = current_year:(current_year + n_periods - 1),
     vec_years_waiting,
+    contribution_or_withdrawal_amount,
     bond_rates,
     stock_rates,
     starting_bond_value = NA_real_,
@@ -95,7 +96,7 @@ plan_retirement_allocation <- function(birth_year, age, starting_amount, annual_
     }
 
     i_row <- with(df_main, period == i_period)
-    df_main[i_row, 6:13] <- c(
+    df_main[i_row, 7:14] <- c(
       current_bond_value,
       current_stock_value,
       new_total,
@@ -108,7 +109,7 @@ plan_retirement_allocation <- function(birth_year, age, starting_amount, annual_
 
     current_bond_value <- current_bond_value + change_bonds
     current_stock_value <- current_stock_value + change_stocks
-    df_main[i_row, 14:15] <- c(
+    df_main[i_row, 15:16] <- c(
       current_bond_value,
       current_stock_value
     )
