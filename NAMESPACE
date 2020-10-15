@@ -2,3 +2,5 @@
 
 export(get_amount_bonds)
 export(get_years_until_depleted)
+export(plan_retirement_allocation)
+importFrom(dplyr,"%>%")

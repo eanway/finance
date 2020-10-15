@@ -10,8 +10,7 @@ get_amount_bonds(
   years_waiting = numeric(),
   constant = 1.01,
   return_rate = 0.05,
-  intercept = 0.87,
-  slope = -0.06
+  ...
 )
 }
 \arguments{

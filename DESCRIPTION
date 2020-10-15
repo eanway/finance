@@ -16,3 +16,5 @@ Suggests:
     testthat
 URL: https://github.com/eanway/finance
 BugReports: https://github.com/eanway/finance/issues
+Imports: 
+    dplyr
