@@ -30,7 +30,7 @@ plan_retirement_allocation <- function(birth_year, age, starting_amount, annual_
   vec_periods <- 1:n_periods
   new_total <- starting_amount
   current_years_until_available <- 65 - age
-  vec_years_waiting <- current_years_until_available - vec_periods
+  vec_years_waiting <- max(0, current_years_until_available - vec_periods)
   current_bond_value <- get_amount_bonds(
     total_amount = new_total,
     annual_amount = annual_withdrawal,
