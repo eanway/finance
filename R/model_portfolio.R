@@ -98,6 +98,27 @@ growth_and_contributions <- function(principle, contribution, years, return_rate
     contribution * (return_plus_one ^ (years + 1) - return_plus_one) / return_rate
 }
 
+#' Ideal contribution with growth and contribution
+#'
+#' What contribution rate will reach a given final amount
+#' given a starting and final amount, years, and return rate?
+#'
+#'
+#' @param principle The initial amount
+#' @param years The number of years of growth and contribution
+#' @param final_amount The final amount after years of growth and contribution
+#' @param return_rate The rate of return each year
+#'
+#' @return A contribution rate
+#' @export
+#'
+#' @examples
+ideal_contribution <- function(principle, years, final_amount, return_rate = 0.05) {
+  return_plus_one <- 1 + return_rate
+  -principle * return_rate * return_plus_one ^ (years - 1) /
+    return_plus_one ^ years - 1
+}
+
 # if you have some years saved
 ## how many years do you need to wait before it's infinite?
 # years_saved = f(Inf) - f(years_waiting)
