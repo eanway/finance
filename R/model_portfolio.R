@@ -119,6 +119,34 @@ lowest_contribution <- function(principle, years, final_amount, return_rate = 0.
     (return_plus_one * (return_plus_one ^ years - 1))
 }
 
+#' Fastest goal total amount
+#'
+#' How quickly can you reach the goal total amount, given a starting amount,
+#' maximum annual contribution, current age, and goal annual amount.
+#'
+#' @param principle The initial total amount
+#' @param maximum_contribution The maximum annual contribution possible
+#' @param age Your current age
+#' @param goal_annual_amount The goal annual amount to withdraw in retirement
+#' @param constant Optional constant to reduce short-term returns. Default determined from experimentation.
+#' @param return_rate Optional long term rate of return. Default determined from experimentation.
+#'
+#' @return A number of years until growth and contributions reaches goal growth
+#' @export
+#'
+#' @examples
+fastest_goal <- function(principle, maximum_contribution, age, goal_annual_amount, constant = 1.01, return_rate = 0.05) {
+  return_plus_one <- 1 + return_rate
+  (
+      log(
+      maximum_contribution * return_plus_one * constant * goal_annual_amount /
+        (maximum_contribution * return_plus_one + principle * return_rate)
+    ) +
+      return_rate * (age - 65)
+  ) /
+    (log(return_plus_one) - return_rate)
+}
+
 # if you have some years saved
 ## how many years do you need to wait before it's infinite?
 # years_saved = f(Inf) - f(years_waiting)
