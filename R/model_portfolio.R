@@ -98,9 +98,9 @@ growth_and_contributions <- function(principle, contribution, years, return_rate
     contribution * (return_plus_one ^ (years + 1) - return_plus_one) / return_rate
 }
 
-#' Ideal contribution with growth and contribution
+#' Lowest contribution with growth and contribution
 #'
-#' What contribution rate will reach a given final amount
+#' What is the lowest contribution rate that will reach a given final amount
 #' given a starting and final amount, years, and return rate?
 #'
 #'
@@ -113,10 +113,10 @@ growth_and_contributions <- function(principle, contribution, years, return_rate
 #' @export
 #'
 #' @examples
-ideal_contribution <- function(principle, years, final_amount, return_rate = 0.05) {
+lowest_contribution <- function(principle, years, final_amount, return_rate = 0.05) {
   return_plus_one <- 1 + return_rate
-  -principle * return_rate * return_plus_one ^ (years - 1) /
-    return_plus_one ^ years - 1
+  return_rate * (final_amount - principle * return_plus_one ^ years) /
+    (return_plus_one * (return_plus_one ^ years - 1))
 }
 
 # if you have some years saved
