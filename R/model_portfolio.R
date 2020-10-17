@@ -78,6 +78,26 @@ get_years_saved_infinite <- function(years_waiting, constant, return_rate) {
   0 - get_years_saved_at_year(years_waiting, constant, return_rate)
 }
 
+#' Growth with contributions
+#'
+#' Growth of an account with both growth and contributions over time.
+#' http://www.moneychimp.com/articles/finworks/fmbasinv.htm
+#'
+#' @param principle The initial amount
+#' @param contribution The annual contribution
+#' @param years The number of years of growth and contribution
+#' @param return_rate The rate of return each year
+#'
+#' @return The final amount
+#' @export
+#'
+#' @examples
+growth_and_contributions <- function(principle, contribution, years, return_rate = 0.05) {
+  return_plus_one <- 1 + return_rate
+  principle * (return_plus_one) ^ years +
+    contribution * (return_plus_one ^ (years + 1) - return_plus_one) / return_rate
+}
+
 # if you have some years saved
 ## how many years do you need to wait before it's infinite?
 # years_saved = f(Inf) - f(years_waiting)
