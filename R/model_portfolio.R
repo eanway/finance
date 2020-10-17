@@ -124,6 +124,9 @@ lowest_contribution <- function(principle, years, final_amount, return_rate = 0.
 #' How quickly can you reach the goal total amount, given a starting amount,
 #' maximum annual contribution, current age, and goal annual amount.
 #'
+#' Numerical approximation using Newton's method.
+#' https://math.stackexchange.com/questions/925838/constructing-a-while-loop-in-r-for-newtons-method
+#'
 #' @param principle The initial total amount
 #' @param maximum_contribution The maximum annual contribution possible
 #' @param age Your current age
@@ -136,15 +139,27 @@ lowest_contribution <- function(principle, years, final_amount, return_rate = 0.
 #'
 #' @examples
 fastest_goal <- function(principle, maximum_contribution, age, goal_annual_amount, constant = 1.01, return_rate = 0.05) {
+  guess <- 1
+  while(abs(g(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)) > 0.1) {
+    guess <- guess -
+      g(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) /
+      g_prime(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)
+  }
+  guess
+}
+
+g <- function(years, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) {
+  get_goal_total_amount(goal_annual_amount, 65 - age - years, constant, return_rate) -
+    growth_and_contributions(principle, maximum_contribution, years, return_rate)
+}
+
+g_prime <- function(years, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) {
   return_plus_one <- 1 + return_rate
-  (
-      log(
-      maximum_contribution * return_plus_one * constant * goal_annual_amount /
-        (maximum_contribution * return_plus_one + principle * return_rate)
-    ) +
-      return_rate * (age - 65)
-  ) /
-    (log(return_plus_one) - return_rate)
+  get_goal_total_amount(goal_annual_amount, 65 - age - years, constant, return_rate) *
+    return_rate -
+    (principle * (return_plus_one) ^ years +
+       maximum_contribution * return_plus_one ^ (years + 1) / return_rate) *
+    log(return_plus_one)
 }
 
 # if you have some years saved

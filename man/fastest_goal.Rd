@@ -33,3 +33,7 @@ A number of years until growth and contributions reaches goal growth
 How quickly can you reach the goal total amount, given a starting amount,
 maximum annual contribution, current age, and goal annual amount.
 }
+\details{
+Numerical approximation using Newton's method.
+https://math.stackexchange.com/questions/925838/constructing-a-while-loop-in-r-for-newtons-method
+}
