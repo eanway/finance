@@ -98,6 +98,13 @@ growth_and_contributions <- function(principle, contribution, years, return_rate
     contribution * (return_plus_one ^ (years + 1) - return_plus_one) / return_rate
 }
 
+growth_and_contributions_prime <- function(principle, contribution, years, return_rate = 0.05) {
+  return_plus_one <- 1 + return_rate
+  (principle * (return_plus_one) ^ years +
+     contribution * return_plus_one ^ (years + 1) / return_rate) *
+    log(return_plus_one)
+}
+
 #' Lowest contribution with growth and contribution
 #'
 #' What is the lowest contribution rate that will reach a given final amount
@@ -140,26 +147,23 @@ lowest_contribution <- function(principle, years, final_amount, return_rate = 0.
 #' @examples
 fastest_goal <- function(principle, maximum_contribution, age, goal_annual_amount, constant = 1.01, return_rate = 0.05) {
   guess <- 1
-  while(abs(g(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)) > 0.1) {
+  while(abs(g_goal(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)) > 0.1) {
     guess <- guess -
-      g(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) /
-      g_prime(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)
+      g_goal(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) /
+      g_goal_prime(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)
   }
   guess
 }
 
-g <- function(years, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) {
+g_goal <- function(years, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) {
   get_goal_total_amount(goal_annual_amount, 65 - age - years, constant, return_rate) -
     growth_and_contributions(principle, maximum_contribution, years, return_rate)
 }
 
-g_prime <- function(years, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) {
-  return_plus_one <- 1 + return_rate
+g_goal_prime <- function(years, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) {
   get_goal_total_amount(goal_annual_amount, 65 - age - years, constant, return_rate) *
     return_rate -
-    (principle * (return_plus_one) ^ years +
-       maximum_contribution * return_plus_one ^ (years + 1) / return_rate) *
-    log(return_plus_one)
+    growth_and_contributions_prime(principle, maximum_contribution, years, return_rate)
 }
 
 # if you have some years saved
