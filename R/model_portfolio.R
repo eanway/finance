@@ -146,7 +146,7 @@ lowest_contribution <- function(principle, years, final_amount, return_rate = 0.
 #'
 #' @examples
 fastest_goal <- function(principle, maximum_contribution, age, goal_annual_amount, constant = 1.01, return_rate = 0.05) {
-  guess <- 1
+  guess <- 0
   while(abs(g_goal(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate)) > 0.1) {
     guess <- guess -
       g_goal(guess, principle, maximum_contribution, age, goal_annual_amount, constant, return_rate) /
@@ -164,6 +164,125 @@ g_goal_prime <- function(years, principle, maximum_contribution, age, goal_annua
   get_goal_total_amount(goal_annual_amount, 65 - age - years, constant, return_rate) *
     return_rate -
     growth_and_contributions_prime(principle, maximum_contribution, years, return_rate)
+}
+
+#' Get bridge amount at age
+#'
+#' Get the amount needed to bridge your early retirement until age 65 based on
+#' a withdrawal rate.
+#'
+#' @param age Current age
+#' @param goal_annual_amount Goal amount to withdraw each year in early retirement
+#' @param return_rate Return rate of the bridge account
+#'
+#' @return
+#' @export
+#'
+#' @examples
+bridge_amount <- function(age, goal_annual_amount, return_rate = 0.04) {
+  return_rate_plus_one <- return_rate + 1
+  goal_annual_amount / (return_rate * return_rate_plus_one ^ (65 - age)) * (
+    return_rate_plus_one ^ (65 - age + 1) - return_rate_plus_one
+  )
+}
+
+#' Early retirement planning
+#'
+#' What proportion of contributions should go to retirement and early retirement
+#' (bridge) funds?
+#'
+#' Determined numerically with Newton's method. Assumes that reaching
+#' early retirement goals occurs at the same time as reaching retirement goals.
+#' Also assumes that annual withdrawals in early retirement and retirement are
+#' the same.
+#'
+#' @param principle_retirement Starting principle amount in retirement funds
+#' @param principle_bridge Starting principle amount in early retirement bridge funds
+#' @param contribution Total contribution to be split between retirement and bridge funds
+#' @param age Current age
+#' @param goal_annual_amount Goal amount to withdraw annually when retired (early and late)
+#' @param constant_retirement A constant to adjust retirement returns
+#' @param constant_bridge A constant to adjust bridge returns
+#' @param return_rate_retirement The rate of return of retirement funds
+#' @param return_rate_bridge The rate of return of bridge funds, usually lower than retirement
+#'
+#' @return A proportion of contributions that should go towards retirement
+#' @export
+#'
+#' @examples
+retire_early <- function(principle_retirement, principle_bridge, contribution, age, goal_annual_amount, constant_retirement = 1.01, return_rate_retirement = 0.05, return_rate_bridge = 0.04) {
+  guess <- 0.5
+  while(
+    abs(
+      g_bridge(
+        guess, principle_retirement, principle_bridge, contribution, age,
+        goal_annual_amount, constant_retirement,
+        return_rate_retirement, return_rate_bridge
+      )
+    ) > 0.1
+  ) {
+    guess <- guess -
+      g_bridge(
+        guess, principle_retirement, principle_bridge, contribution, age,
+        goal_annual_amount, constant_retirement,
+        return_rate_retirement, return_rate_bridge
+      ) /
+      g_bridge_prime(
+        guess, principle_retirement, principle_bridge, contribution, age,
+        goal_annual_amount, constant_retirement,
+        return_rate_retirement, return_rate_bridge
+      )
+  }
+  guess
+}
+
+g_bridge <- function(contribution_percent_retirement, principle_retirement, principle_bridge, contribution, age, goal_annual_amount, constant_retirement, return_rate_retirement, return_rate_bridge) {
+  contribution_retirement <- contribution_percent_retirement * contribution
+  contribution_bridge <- contribution - contribution_retirement
+
+
+  years_to_goal <- fastest_goal(
+    principle_retirement, contribution_retirement, age, goal_annual_amount,
+    constant_retirement, return_rate_retirement
+  )
+
+  years_to_bridge <- get_years_to_bridge(contribution_bridge, principle_bridge, age, goal_annual_amount, return_rate_bridge)
+
+  years_to_goal - years_to_bridge
+}
+
+get_years_to_bridge <- function(contribution_bridge, principle_bridge, age, goal_annual_amount, return_rate_bridge) {
+  return_bridge_plus_one <- return_rate_bridge + 1
+
+  log(
+    (
+      return_bridge_plus_one ^ 65 * (goal_annual_amount + contribution_bridge)
+    ) /
+    (
+      goal_annual_amount * return_bridge_plus_one ^ age +
+        contribution_bridge * return_bridge_plus_one ^ 65 +
+        principle_bridge * return_rate_bridge * return_bridge_plus_one ^ 64
+    )
+  ) /
+  log(return_bridge_plus_one)
+}
+
+g_bridge_prime <- function(contribution_percent_retirement, principle_retirement, principle_bridge, contribution, age, goal_annual_amount, constant_retirement, return_rate_retirement, return_rate_bridge) {
+  contribution_retirement <- contribution_percent_retirement * contribution
+
+  years_to_goal <- fastest_goal(
+    principle_retirement, contribution_retirement, age, goal_annual_amount,
+    constant_retirement, return_rate_retirement
+  )
+
+  goal_prime <- g_goal_prime(
+    years_to_goal, principle_retirement, contribution_retirement, age,
+    goal_annual_amount, constant_retirement, return_rate_retirement
+  )
+
+  bridge_prime <- 1
+
+  goal_prime - bridge_prime
 }
 
 # if you have some years saved
