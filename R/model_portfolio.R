@@ -216,7 +216,7 @@ retire_early <- function(principle_retirement, principle_bridge, contribution, a
   )
 
   lowest_contribution_to_retire <- lowest_contribution(
-    goal_annual_amount, 65 - age, get_goal_total_amount(48000, 0)
+    goal_annual_amount, 65 - age, get_goal_total_amount(goal_annual_amount, 0)
   )
 
   if(age + fewest_years_to_retire > 65 | lowest_contribution_to_retire > contribution) {
@@ -297,6 +297,102 @@ g_bridge_prime <- function(contribution_percent_retirement, principle_retirement
   bridge_prime <- 1
 
   goal_prime - bridge_prime
+}
+
+#' Retirement summary
+#'
+#' A text summary of (early) retirement prospects
+#'
+#' @param year Current year
+#' @param age Current age
+#' @param goal_annual_amount Amount to withdraw in retirement
+#' @param contribution Amount added to retirement or bridge accounts each year
+#' @param principle_retirement Current amount in retirement accounts
+#' @param principle_bridge Current amount in bridge (early retirement) accounts
+#' @param constant_retirement Optional constant for retirement growth
+#' @param return_rate_retirement Optional return rate for retirement growth
+#' @param return_rate_bridge Optional return rate for bridge growth
+#'
+#' @return
+#' @export
+#'
+#' @examples
+retirement_summary <- function(year, age, goal_annual_amount, contribution, principle_retirement, principle_bridge, constant_retirement = 1.01, return_rate_retirement = 0.05, return_rate_bridge = 0.04) {
+  sprintf("You will be 65 in %i", year - age + 65) %>%
+    print()
+
+  lowest_contribution_to_retire <- lowest_contribution(
+    goal_annual_amount, 65 - age, get_goal_total_amount(goal_annual_amount, 0)
+  )
+
+  if(lowest_contribution_to_retire > contribution) {
+    sprintf(
+      "You need to contribute at least $%f each year to retire by 65",
+      round(lowest_contribution_to_retire, 2)
+    ) %>%
+      print()
+  } else {
+    optimal_percent_retirement_contribution <- retire_early(
+      principle_retirement, principle_bridge,
+      contribution, age, goal_annual_amount,
+      constant_retirement, return_rate_retirement, return_rate_bridge
+    )
+
+    optimal_amount_retirement_contribution <-
+      optimal_percent_retirement_contribution * contribution
+
+    years_to_retirement <- fastest_goal(
+      principle_retirement, optimal_amount_retirement_contribution, age, goal_annual_amount,
+      constant_retirement, return_rate_retirement
+    )
+
+    sprintf(
+      "You can retire as early as %i (%.2f years)",
+      floor(years_to_retirement) + year,
+      years_to_retirement
+    ) %>%
+      print()
+
+    sprintf(
+      "if you contribute %.1f%% ($%.0f) to retirement each year",
+      optimal_percent_retirement_contribution * 100,
+      optimal_amount_retirement_contribution
+    ) %>%
+      print()
+
+    sprintf(
+      "and %.1f%% ($%.0f) to bridge each year",
+      (1-optimal_percent_retirement_contribution) * 100,
+      contribution - optimal_amount_retirement_contribution
+    ) %>%
+      print()
+  }
+
+  amount_bonds_retirement <- get_amount_bonds(
+    principle_retirement, goal_annual_amount, 65 - age,
+    constant_retirement, return_rate_retirement
+  )
+
+  sprintf(
+    "Your retirement account should have an asset allocation of %.2f%% ($%.0f) bonds",
+    amount_bonds_retirement / principle_retirement * 100,
+    amount_bonds_retirement
+  ) %>%
+    print()
+
+  if(lowest_contribution_to_retire < contribution) {
+    amount_bonds_bridge <- get_amount_bonds(
+      principle_bridge, goal_annual_amount, years_to_retirement,
+      constant_retirement, return_rate_bridge
+    )
+
+    sprintf(
+      "Your bridge account should have an asset allocation of %.2f%% ($%.0f) bonds",
+      amount_bonds_bridge / principle_bridge * 100,
+      amount_bonds_bridge
+    ) %>%
+      print()
+  }
 }
 
 # if you have some years saved
