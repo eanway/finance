@@ -211,7 +211,21 @@ bridge_amount <- function(age, goal_annual_amount, return_rate = 0.04) {
 #'
 #' @examples
 retire_early <- function(principle_retirement, principle_bridge, contribution, age, goal_annual_amount, constant_retirement = 1.01, return_rate_retirement = 0.05, return_rate_bridge = 0.04) {
+  fewest_years_to_retire <- fastest_goal(
+    principle_retirement, contribution, age, goal_annual_amount
+  )
+
+  lowest_contribution_to_retire <- lowest_contribution(
+    goal_annual_amount, 65 - age, get_goal_total_amount(48000, 0)
+  )
+
+  if(age + fewest_years_to_retire > 65 | lowest_contribution_to_retire > contribution) {
+    warning("Contribution is too low or goal annual amount is too high to retire by 65") %>%
+      stop()
+  }
+
   guess <- 0.5
+
   while(
     abs(
       g_bridge(
