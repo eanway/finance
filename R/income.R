@@ -8,7 +8,7 @@
 #' @examples
 #' get_income_percentile(25, 30000)
 get_income_percentile <- function(age, income) {
-  predict(
+  scam::predict.scam(
     smooth_percent_by_income_age, data.frame(age = age, income = income)
   ) %>%
     unname()
@@ -30,7 +30,7 @@ get_future_income <- function(current_age, current_income, retirement_age = 70) 
 
   vec_age_to_retirement <- current_age:retirement_age
 
-  predict(
+  scam::predict.scam(
     smooth_income_by_percent_age,
     data.frame(age = vec_age_to_retirement, percent = income_pct)
   ) %>%

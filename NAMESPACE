@@ -2,6 +2,9 @@
 
 export(bridge_amount)
 export(fastest_goal)
+export(find_constant_withdrawal_rate)
+export(find_max_withdrawal)
+export(find_years_constant_withdrawals)
 export(get_amount_bonds)
 export(get_future_income)
 export(get_goal_total_amount)
