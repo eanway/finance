@@ -12,7 +12,13 @@ get_lifetime_income(
 )
 }
 \arguments{
-\item{retirement_age}{}
+\item{current_age}{Current age}
+
+\item{current_income}{Current annual income}
+
+\item{starting_age}{Age when started working}
+
+\item{retirement_age}{Age when stopped working}
 }
 \value{
 
@@ -20,4 +26,7 @@ get_lifetime_income(
 \description{
 Estimates lifetime income based on current age and income.
 Used to estimate social security benefits.
+}
+\examples{
+get_lifetime_income(25, 30000)
 }

@@ -4,7 +4,12 @@
 \alias{get_income_percentile}
 \title{Income percentile}
 \usage{
-get_income_percentile(age, income)
+get_income_percentile(current_age, current_income)
+}
+\arguments{
+\item{current_age}{Current age}
+
+\item{current_income}{Current annual income}
 }
 \value{
 Estimated income percentile

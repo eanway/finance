@@ -10,6 +10,8 @@ get_future_income(current_age, current_income, retirement_age = 70)
 \item{current_age}{Current age}
 
 \item{current_income}{Current income}
+
+\item{retirement_age}{Age when stopped working}
 }
 \value{
 Vector of future incomes
@@ -18,4 +20,7 @@ Vector of future incomes
 Estimates future income until retirement from current age and income.
 Used to estimate total lifetime income to determine optimal tax brackets
 for tax-deferral.
+}
+\examples{
+get_future_income(25, 30000)
 }

@@ -3,14 +3,18 @@
 #' Estimates income percentile given current age and income.
 #' Used to estimate future earnings.
 #'
+#' @param current_age Current age
+#' @param current_income Current annual income
+#'
 #' @return Estimated income percentile
 #' @export
 #'
 #' @examples
 #' get_income_percentile(25, 30000)
-get_income_percentile <- function(age, income) {
+get_income_percentile <- function(current_age, current_income) {
   scam::predict.scam(
-    smooth_percent_by_income_age, data.frame(age = age, income = income)
+    smooth_percent_by_income_age,
+    data.frame(age = current_age, income = current_income)
   ) %>%
     unname()
 }
@@ -20,15 +24,16 @@ get_income_percentile <- function(age, income) {
 #' Estimates lifetime income based on current age and income.
 #' Used to estimate social security benefits.
 #'
-#' @param current_age
-#' @param current_income
-#' @param starting_age
-#' @param retirement_age
+#' @param current_age Current age
+#' @param current_income Current annual income
+#' @param starting_age Age when started working
+#' @param retirement_age Age when stopped working
 #'
 #' @return
 #' @export
 #'
 #' @examples
+#' get_lifetime_income(25, 30000)
 get_lifetime_income <- function(
   current_age, current_income, starting_age = 18, retirement_age = 70
 ) {
@@ -51,11 +56,13 @@ get_lifetime_income <- function(
 #'
 #' @param current_age Current age
 #' @param current_income Current income
+#' @param retirement_age Age when stopped working
 #'
 #' @return Vector of future incomes
 #' @export
 #'
 #' @examples
+#' get_future_income(25, 30000)
 get_future_income <- function(current_age, current_income, retirement_age = 70) {
   lifetime_income <- get_lifetime_income(
     current_age, current_income, retirement_age = 70
