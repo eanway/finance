@@ -4,7 +4,7 @@
 \alias{find_constant_withdrawal_rate}
 \title{Find Constant Withdrawal Rate}
 \usage{
-find_constant_withdrawal_rate(rmds, growth_rate = 1.03, increment = 1e-04)
+find_constant_withdrawal_rate(rmds, growth_rate = 1.03, decimals = 4)
 }
 \arguments{
 \item{rmds}{A vector of required minimum distributions (0-100)}

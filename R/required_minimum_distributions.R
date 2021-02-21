@@ -46,24 +46,26 @@ find_max_withdrawal <- function(
 #' @examples
 #' find_constant_withdrawal_rate(20:10)
 find_constant_withdrawal_rate <- function(
-  rmds, growth_rate = 1.03, increment = 1e-04
+  rmds, growth_rate = 1.03, decimals = 4
 ) {
   under_rmds <- TRUE
 
-  withdrawal_rate <- -increment
+  increment <- 10^-decimals
+
+  withdrawal_rate <- 0
 
   while (under_rmds) {
-    withdrawal_rate <- withdrawal_rate + increment
-
     max_withdrawal <- find_max_withdrawal(
       rmds, account_balance = 1, constant_withdrawal = withdrawal_rate,
       growth_rate = growth_rate
     )
 
     under_rmds <- withdrawal_rate < max_withdrawal
+
+    withdrawal_rate <- withdrawal_rate + increment
   }
 
-  withdrawal_rate
+  round(withdrawal_rate - increment, decimals)
 }
 
 #' Find the number of years possible with constant withdrawals
