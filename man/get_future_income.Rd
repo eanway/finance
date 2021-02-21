@@ -16,4 +16,6 @@ Vector of future incomes
 }
 \description{
 Estimates future income until retirement from current age and income.
+Used to estimate total lifetime income to determine optimal tax brackets
+for tax-deferral.
 }

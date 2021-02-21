@@ -11,6 +11,7 @@ Estimated income percentile
 }
 \description{
 Estimates income percentile given current age and income.
+Used to estimate future earnings.
 }
 \examples{
 get_income_percentile(25, 30000)
