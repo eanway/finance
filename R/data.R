@@ -62,3 +62,21 @@
 #'   data.frame(percent = 0.5, age = 25)
 #' )
 "smooth_income_by_percent_age"
+
+#' Social security bends
+#'
+#' Dataframe of social security bends and percent benefits for 2021
+#'
+#' @docType data
+#'
+#' @usage data(ss_bends)
+#'
+#' @format An object of class 'data.frame'
+#'
+#' @keywords datasets
+#'
+#' @source \href{https://www.ssa.gov/oact/COLA/piaformula.html}{PIA formula}
+#'
+#' @examples
+#' data(ss_bends)
+"ss_bends"
