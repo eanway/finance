@@ -1,21 +1,22 @@
 #' Income percentile
 #'
-#' @return Table of income percentiles
+#' Estimates income percentile given current age and income.
+#'
+#' @return Estimated income percentile
 #' @export
 #'
 #' @examples
+#' get_income_percentile(25, 30000)
 get_income_percentile <- function(age, income) {
-  loess_percent <- loess(
-    percent ~ age + income, data = income_trajectories, span = 0.5
-  )
-
-  predict(loess_percent, data.frame(age = age, income = income)) %>%
+  predict(
+    smooth_percent_by_income_age, data.frame(age = age, income = income)
+  ) %>%
     unname()
 }
 
 #' Get future income trajectory
 #'
-#' Assumes income will increase from until 40 then plateau
+#' Estimates future income until retirement from current age and income.
 #'
 #' @param current_age Current age
 #' @param current_income Current income
@@ -26,14 +27,14 @@ get_income_percentile <- function(age, income) {
 #' @examples
 get_future_income <- function(current_age, current_income, retirement_age = 70) {
   income_pct <- get_income_percentile(current_age, current_income)
-  loess_income <- loess(
-    income ~ age + percent, data = income_trajectories, span = 0.5
-  )
+
+  vec_age_to_retirement <- current_age:retirement_age
 
   predict(
-    loess_income,
-    data.frame(age = current_age:retirement_age, percent = income_pct)
-  )
+    smooth_income_by_percent_age,
+    data.frame(age = vec_age_to_retirement, percent = income_pct)
+  ) %>%
+    setNames(vec_age_to_retirement)
 }
 
 #' Tax efficient deferrals

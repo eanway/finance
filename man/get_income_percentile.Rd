@@ -7,8 +7,11 @@
 get_income_percentile(age, income)
 }
 \value{
-Table of income percentiles
+Estimated income percentile
 }
 \description{
-Income percentile
+Estimates income percentile given current age and income.
+}
+\examples{
+get_income_percentile(25, 30000)
 }

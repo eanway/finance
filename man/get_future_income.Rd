@@ -15,5 +15,9 @@ get_future_income(current_age, current_income, retirement_age = 70)
 Vector of future incomes
 }
 \description{
-Assumes income will increase from until 40 then plateau
+Estimates future income until retirement from current age and income.
+}
+\examples{
+future_income <- get_future_income(25, 30000)
+print(future_income)
 }
