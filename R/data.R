@@ -63,6 +63,25 @@
 #' )
 "smooth_income_by_percent_age"
 
+#' Required minimum distributions (RMDs)
+#'
+#' Required minimum distributions for deferred taxable income in retirement in
+#' 2021
+#'
+#' @docType data
+#'
+#' @usage data(rmds)
+#'
+#' @format A double vector
+#'
+#' @keywords datasets
+#'
+#' @source \href{https://www.irs.gov/publications/p590b#en_US_2019_publink1000231258}{RMDs}
+#'
+#' @examples
+#' data(rmds)
+"rmds"
+
 #' Social security bends
 #'
 #' Dataframe of social security bends and percent benefits for 2021
@@ -80,3 +99,21 @@
 #' @examples
 #' data(ss_bends)
 "ss_bends"
+
+#' Tax brackets
+#'
+#' Dataframe of tax brackets and tax rates for 2020
+#'
+#' @docType data
+#'
+#' @usage data(tax_brackets)
+#'
+#' @format An object of class 'data.frame'
+#'
+#' @keywords datasets
+#'
+#' @source \href{https://www.irs.gov/newsroom/irs-provides-tax-inflation-adjustments-for-tax-year-2020}{IRS 2020}
+#'
+#' @examples
+#' data(tax_brackets)
+"tax_brackets"

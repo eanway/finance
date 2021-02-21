@@ -6,23 +6,29 @@
 \usage{
 tax_efficient_deferrals(
   current_age,
-  tax_brackets,
-  current_savings_tax_deferred,
-  future_income
+  current_income,
+  ss_bends,
+  rmds,
+  tax_brackets
 )
 }
 \arguments{
 \item{current_age}{Current age}
 
-\item{tax_brackets}{Table of tax brackets}
+\item{current_income}{Current annual income}
 
-\item{current_savings_tax_deferred}{Current amount of tax-deferred savings}
+\item{ss_bends}{A table of social security bends and benefit rates}
 
-\item{future_income}{Vector of future income until retirement}
+\item{rmds}{A vector of required minimum distributions}
+
+\item{tax_brackets}{A table of tax brackets and tax rates}
 }
 \value{
 
 }
 \description{
-Tax efficient deferrals
+Estimate the tax bracket in/above which you should defer taxes
+}
+\examples{
+tax_efficient_deferrals(25, 30000, ss_bends, rmds, tax_brackets)
 }
