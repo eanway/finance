@@ -6,19 +6,19 @@
 \usage{
 tax_efficient_deferrals(
   current_age,
-  future_income,
-  income_trajectories = income_trajectories_2021,
-  tax_brackets = tax_brackets_2021
+  tax_brackets,
+  current_savings_tax_deferred,
+  future_income
 )
 }
 \arguments{
-\item{income_trajectories}{Table of income trajectories}
+\item{current_age}{Current age}
 
 \item{tax_brackets}{Table of tax brackets}
 
-\item{income}{Current income}
+\item{current_savings_tax_deferred}{Current amount of tax-deferred savings}
 
-\item{age}{Current age}
+\item{future_income}{Vector of future income until retirement}
 }
 \value{
 
