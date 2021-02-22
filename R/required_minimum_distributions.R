@@ -92,3 +92,32 @@ find_years_constant_withdrawals <- function(
   }
   years
 }
+
+
+#' Total years of deferred savings
+#'
+#' Calculates the number of years of savings you would need in your
+#' tax-deferred account to withdraw the same amount each year, assuming the
+#' account also continues to grow. This value can be multiplied by the amount
+#' withdrawn each year to determine an initial total amount of savings.
+#'
+#' @param rmds A vector of required minimum distributions (0-100)
+#' @param growth_rate Annual growth rate
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' total_years_deferred_savings(rmds)
+total_years_deferred_savings <- function(rmds, growth_rate = 1.03) {
+  constant_withdrawal <- find_constant_withdrawal_rate(
+    rmds, growth_rate = growth_rate
+  )
+
+  years_withdrawals <- find_years_constant_withdrawals(
+    constant_withdrawal,
+    growth_rate = growth_rate
+  )
+
+  sum(1 / growth_rate^(0:years_withdrawals))
+}

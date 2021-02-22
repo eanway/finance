@@ -72,6 +72,7 @@ deferral_tax_bracket <- function(
 #' @param ss_bends A table of social security bends and benefit rates
 #' @param rmds A vector of required minimum distributions
 #' @param tax_brackets A table of tax brackets and tax rates
+#' @param growth_rate Annual growth rate
 #'
 #' @return
 #' @export
@@ -79,7 +80,7 @@ deferral_tax_bracket <- function(
 #' @examples
 #' tax_efficient_deferrals(25, 30000, ss_bends, rmds, tax_brackets)
 tax_efficient_deferrals <- function(
-  current_age, current_income, ss_bends, rmds, tax_brackets
+  current_age, current_income, ss_bends, rmds, tax_brackets, growth_rate = 1.03
 ) {
   future_income <- get_future_income(current_age, current_income)
 
@@ -87,11 +88,38 @@ tax_efficient_deferrals <- function(
 
   ss_benefit <- social_security_benefit(lifetime_income, ss_bends) * 12
 
-  constant_withdrawal <- find_constant_withdrawal_rate(rmds)
-
-  years_withdrawals <- find_years_constant_withdrawals(constant_withdrawal)
-
-  starting_amount <- sum(1 / 1.03^(0:years_withdrawals))
+  starting_amount <- total_years_deferred_savings(rmds, growth_rate)
 
   deferral_tax_bracket(future_income, tax_brackets, ss_benefit, starting_amount)
+}
+
+#' Total deferred savings
+#'
+#' Calculates the total savings needed to maximize tax deferred withdrawals
+#'
+#' @param current_age Current age
+#' @param current_income Current income
+#' @param ss_bends A table of social security bends and benefit rates
+#' @param rmds A vector of required minimum distributions
+#' @param tax_brackets A table of tax brackets and tax rates
+#' @param growth_rate Annual growth rate
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' total_deferred_savings(25, 30000, ss_bends, rmds, tax_brackets)
+total_deferred_savings <- function(
+  current_age, current_income, ss_bends, rmds, tax_brackets, growth_rate = 1.03
+) {
+  starting_amount <- total_years_deferred_savings(rmds, growth_rate)
+
+  max_tax_bracket <- tax_efficient_deferrals(
+    current_age, current_income, ss_bends, rmds, tax_brackets, growth_rate
+  )
+
+  tax_brackets %>%
+    dplyr::filter(marginal_tax_rate == max_tax_bracket) %>%
+    dplyr::pull(cumulative_income_over) %>%
+    `*`(starting_amount)
 }
