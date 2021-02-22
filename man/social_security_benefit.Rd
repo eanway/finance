@@ -2,12 +2,14 @@
 % Please edit documentation in R/social_security.R
 \name{social_security_benefit}
 \alias{social_security_benefit}
-\title{Social Security benefits}
+\title{Estimate Social Security benefit}
 \usage{
-social_security_benefit(lifetime_income, ss_bends)
+social_security_benefit(current_age, current_income, ss_bends)
 }
 \arguments{
-\item{lifetime_income}{Lifetime income by year}
+\item{current_age}{Current age}
+
+\item{current_income}{Current annual income}
 
 \item{ss_bends}{Data frame of social security bends: income thresholds and
 benefit percents}
@@ -16,8 +18,8 @@ benefit percents}
 
 }
 \description{
-Social Security benefits
+Estimate Social Security benefit
 }
 \examples{
-social_security_benefit(get_lifetime_income(25, 30000), ss_bends)
+social_security_benefit(25, 30000, ss_bends)
 }

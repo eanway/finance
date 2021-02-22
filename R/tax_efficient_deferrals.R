@@ -55,7 +55,9 @@ deferral_tax_bracket <- function(
       total_income_over = purrr::map_dbl(
         cumulative_income_over, get_total_income_over, future_income = future_income
       ),
-      taxable_income_over = cumulative_income_over - ss_benefit / 2,
+      taxable_income_over = adjust_taxable_income_for_social_security(
+        cumulative_income_over, ss_benefit
+      ),
       taxable_savings_needed = taxable_income_over * years_savings
     ) %>%
     dplyr::filter(total_income_over > taxable_savings_needed) %>%
@@ -84,9 +86,7 @@ tax_efficient_deferrals <- function(
 ) {
   future_income <- get_future_income(current_age, current_income)
 
-  lifetime_income <- get_lifetime_income(current_age, current_income)
-
-  ss_benefit <- social_security_benefit(lifetime_income, ss_bends) * 12
+  ss_benefit <- social_security_benefit(current_age, current_income, ss_bends)
 
   starting_amount <- total_years_deferred_savings(rmds, growth_rate)
 
@@ -118,8 +118,11 @@ total_deferred_savings <- function(
     current_age, current_income, ss_bends, rmds, tax_brackets, growth_rate
   )
 
+  ss_benefit <- social_security_benefit(current_age, current_income, ss_bends)
+
   tax_brackets %>%
     dplyr::filter(marginal_tax_rate == max_tax_bracket) %>%
     dplyr::pull(cumulative_income_over) %>%
+    adjust_taxable_income_for_social_security(ss_benefit) %>%
     `*`(starting_amount)
 }
